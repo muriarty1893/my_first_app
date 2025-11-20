@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:my_first_app/screens/exercise_list_screen.dart';
 import 'package:my_first_app/screens/program_screen.dart';
+import 'package:my_first_app/screens/profile_screen.dart';
+import 'package:my_first_app/screens/progress_screen.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
@@ -18,6 +20,32 @@ class HomeScreen extends StatelessWidget {
       body: ListView(
         padding: const EdgeInsets.all(16.0),
         children: [
+          _buildNavigationCard(
+            context: context,
+            icon: Icons.person_outline,
+            title: 'My Profile',
+            subtitle: 'View and edit your personal details.',
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => const ProfileScreen()),
+              );
+            },
+          ),
+          const SizedBox(height: 16),
+          _buildNavigationCard(
+            context: context,
+            icon: Icons.show_chart,
+            title: 'My Progress',
+            subtitle: 'Visualize your workout history.',
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => const ProgressScreen()),
+              );
+            },
+          ),
+          const SizedBox(height: 16),
           _buildNavigationCard(
             context: context,
             icon: Icons.assignment_outlined,

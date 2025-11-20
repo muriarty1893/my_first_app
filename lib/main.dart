@@ -1,7 +1,8 @@
+import 'package:my_first_app/screens/main_screen.dart';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
-import 'package:my_first_app/screens/home_screen.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:my_first_app/services/csv_service.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
@@ -44,14 +45,19 @@ class MyApp extends StatelessWidget {
         useMaterial3: true,
       ),
       darkTheme: ThemeData(
+        scaffoldBackgroundColor: const Color(0xFF1C1C1E),
+        primaryColor: const Color(0xFFD0FD3E),
+        textTheme: GoogleFonts.poppinsTextTheme(
+          ThemeData.dark().textTheme,
+        ),
         colorScheme: ColorScheme.fromSeed(
-          seedColor: Colors.blue,
+          seedColor: const Color(0xFFD0FD3E),
           brightness: Brightness.dark,
         ),
         useMaterial3: true,
       ),
-      themeMode: ThemeMode.system, // Use system theme
-      home: const HomeScreen(),
+      themeMode: ThemeMode.dark, // Enforce dark theme
+      home: const MainScreen(),
       debugShowCheckedModeBanner: false,
     );
   }

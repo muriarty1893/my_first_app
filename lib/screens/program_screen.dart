@@ -1,3 +1,6 @@
+import 'dart:async';
+
+import 'package:my_first_app/models/workout_log.dart';
 import 'package:flutter/material.dart';
 import 'package:my_first_app/data/database_helper.dart';
 import 'package:my_first_app/models/program_exercise.dart';
@@ -43,6 +46,95 @@ class _ProgramScreenState extends State<ProgramScreen> {
     });
   }
 
+  Future<void> _showEditExerciseDialog(ProgramExercise exercise) async {
+    final formKey = GlobalKey<FormState>();
+    final setsController = TextEditingController(text: exercise.sets.toString());
+    final repsController = TextEditingController(text: exercise.reps.toString());
+
+    return showDialog<void>(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('Edit "${exercise.exerciseTitle}"'),
+          content: Form(
+            key: formKey,
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: <Widget>[
+                TextFormField(
+                  controller: setsController,
+                  decoration: const InputDecoration(labelText: 'Sets'),
+                  keyboardType: TextInputType.number,
+                  validator: (value) {
+                    if (value == null || value.isEmpty || int.tryParse(value) == null) {
+                      return 'Please enter a valid number';
+                    }
+                    return null;
+                  },
+                ),
+                TextFormField(
+                  controller: repsController,
+                  decoration: const InputDecoration(labelText: 'Reps'),
+                  keyboardType: TextInputType.number,
+                  validator: (value) {
+                    if (value == null || value.isEmpty || int.tryParse(value) == null) {
+                      return 'Please enter a valid number';
+                    }
+                    return null;
+                  },
+                ),
+              ],
+            ),
+          ),
+          actions: <Widget>[
+            TextButton(
+              child: const Text('Cancel'),
+              onPressed: () => Navigator.of(context).pop(),
+            ),
+            TextButton(
+              child: const Text('Save'),
+              onPressed: () async {
+                if (formKey.currentState!.validate()) {
+                  exercise.sets = int.parse(setsController.text);
+                  exercise.reps = int.parse(repsController.text);
+                  await DatabaseHelper.instance.updateProgramExercise(exercise);
+                  Navigator.of(context).pop();
+                  _refreshProgram();
+                }
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  Future<void> _showClearWeekDialog() async {
+    return showDialog<void>(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Clear Week'),
+          content: const Text('Are you sure you want to uncheck all exercises for the week?'),
+          actions: <Widget>[
+            TextButton(
+              child: const Text('Cancel'),
+              onPressed: () => Navigator.of(context).pop(),
+            ),
+            TextButton(
+              child: const Text('Clear'),
+              onPressed: () async {
+                await DatabaseHelper.instance.clearAllExerciseCompletion();
+                Navigator.of(context).pop();
+                _refreshProgram();
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -50,9 +142,14 @@ class _ProgramScreenState extends State<ProgramScreen> {
         title: const Text('My Weekly Program'),
         actions: [
           IconButton(
+            icon: const Icon(Icons.delete_sweep_outlined),
+            tooltip: 'Clear Week',
+            onPressed: _showClearWeekDialog,
+          ),
+          IconButton(
             icon: const Icon(Icons.refresh),
             onPressed: _refreshProgram,
-          )
+          ),
         ],
       ),
       body: FutureBuilder<Map<String, List<ProgramExercise>>>(
@@ -116,23 +213,46 @@ class _ProgramScreenState extends State<ProgramScreen> {
                             value: progExercise.isCompleted,
                             onChanged: (bool? value) async {
                               if (value != null) {
-                                setState(() {
-                                  progExercise.isCompleted = value;
-                                });
+                                progExercise.isCompleted = value;
                                 await DatabaseHelper.instance.updateProgramExercise(progExercise);
+
+                                if (value) {
+                                  final log = WorkoutLog(
+                                    exerciseId: progExercise.exerciseId,
+                                    exerciseTitle: progExercise.exerciseTitle,
+                                    sets: progExercise.sets,
+                                    reps: progExercise.reps,
+                                    date: DateTime.now(),
+                                  );
+                                  await DatabaseHelper.instance.insertWorkoutLog(log);
+                                }
+                                
+                                _refreshProgram();
                               }
                             },
                           ),
-                          trailing: IconButton(
-                            icon: const Icon(Icons.delete_outline, size: 20, color: Colors.redAccent),
-                            onPressed: () async {
-                              await DatabaseHelper.instance.deleteProgramExercise(progExercise.id!);
-                              _refreshProgram();
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                SnackBar(content: Text('${progExercise.exerciseTitle} removed from program.')),
-                              );
+                          trailing: PopupMenuButton<String>(
+                            onSelected: (value) async {
+                              if (value == 'edit') {
+                                unawaited(_showEditExerciseDialog(progExercise));
+                              } else if (value == 'delete') {
+                                await DatabaseHelper.instance.deleteProgramExercise(progExercise.id!);
+                                _refreshProgram();
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  SnackBar(content: Text('${progExercise.exerciseTitle} removed from program.')),
+                                );
+                              }
                             },
-                            tooltip: 'Delete',
+                            itemBuilder: (BuildContext context) => <PopupMenuEntry<String>>[
+                              const PopupMenuItem<String>(
+                                value: 'edit',
+                                child: Text('Edit'),
+                              ),
+                              const PopupMenuItem<String>(
+                                value: 'delete',
+                                child: Text('Delete'),
+                              ),
+                            ],
                           ),
                         ),
                       );
