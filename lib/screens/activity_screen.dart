@@ -1,7 +1,9 @@
-import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
+import 'package:my_first_app/data/database_helper.dart';
+import 'package:my_first_app/models/program_exercise.dart';
+import 'package:my_first_app/models/workout_log.dart';
 
 class ActivityScreen extends StatefulWidget {
   const ActivityScreen({super.key});
@@ -11,8 +13,23 @@ class ActivityScreen extends StatefulWidget {
 }
 
 class _ActivityScreenState extends State<ActivityScreen> {
-  int _selectedChipIndex = 0;
   DateTime _selectedDate = DateTime.now();
+  late Future<List<ProgramExercise>> _todaysExercisesFuture;
+  late Future<List<WorkoutLog>> _workoutLogsFuture;
+
+  @override
+  void initState() {
+    super.initState();
+    _initFutures();
+  }
+
+  void _initFutures() {
+    final dbHelper = DatabaseHelper.instance;
+    final today = DateFormat('EEEE').format(DateTime.now());
+    _todaysExercisesFuture = dbHelper.getProgramExercises().then((exercises) =>
+        exercises.where((e) => e.dayOfWeek == today).toList());
+    _workoutLogsFuture = dbHelper.getWorkoutLogs();
+  }
 
   void _onDateChanged(int days) {
     setState(() {
@@ -44,13 +61,35 @@ class _ActivityScreenState extends State<ActivityScreen> {
           children: [
             _buildCalendarView(),
             const SizedBox(height: 24),
-            _buildTodaysChallengeCard(),
+            FutureBuilder<List<ProgramExercise>>(
+              future: _todaysExercisesFuture,
+              builder: (context, snapshot) {
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return const Center(child: CircularProgressIndicator());
+                } else if (snapshot.hasError) {
+                  return Center(child: Text('Error: ${snapshot.error}'));
+                } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+                  return _buildTodaysChallengeCard([]);
+                } else {
+                  return _buildTodaysChallengeCard(snapshot.data!);
+                }
+              },
+            ),
             const SizedBox(height: 24),
-            _buildFilterChips(),
-            const SizedBox(height: 24),
-            _buildStatsCards(),
-            const SizedBox(height: 24),
-            _buildCalorieCard(),
+            FutureBuilder<List<WorkoutLog>>(
+              future: _workoutLogsFuture,
+              builder: (context, snapshot) {
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return const Center(child: CircularProgressIndicator());
+                } else if (snapshot.hasError) {
+                  return Center(child: Text('Error: ${snapshot.error}'));
+                } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+                  return const Center(child: Text('No workout history.'));
+                } else {
+                  return _buildWorkoutHistory(snapshot.data!);
+                }
+              },
+            ),
           ],
         ),
       ),
@@ -77,7 +116,7 @@ class _ActivityScreenState extends State<ActivityScreen> {
                   onPressed: () => _onDateChanged(-7),
                   icon: const Icon(Icons.chevron_left),
                   style: IconButton.styleFrom(
-                    backgroundColor: Colors.white.withOpacity(0.1),
+                    backgroundColor: Colors.white.withAlpha(25),
                   ),
                 ),
                 const SizedBox(width: 8),
@@ -85,7 +124,7 @@ class _ActivityScreenState extends State<ActivityScreen> {
                   onPressed: () => _onDateChanged(7),
                   icon: const Icon(Icons.chevron_right),
                   style: IconButton.styleFrom(
-                    backgroundColor: Colors.white.withOpacity(0.1),
+                    backgroundColor: Colors.white.withAlpha(25),
                   ),
                 ),
               ],
@@ -108,217 +147,46 @@ class _ActivityScreenState extends State<ActivityScreen> {
     );
   }
 
-  Widget _buildCalorieCard() {
-    return Card(
-      color: Colors.grey.withOpacity(0.2),
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(20),
-      ),
-      child: Padding(
-        padding: const EdgeInsets.all(20.0),
-        child: Row(
-          children: [
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  _buildCalorieInfo('Target', '1200 Kcal', Colors.yellow),
-                  const SizedBox(height: 16),
-                  _buildCalorieInfo('Burned', '328 Kcal', Colors.purple),
-                  const SizedBox(height: 16),
-                  _buildCalorieInfo('Remaining', '872 Kcal', Colors.lightBlue),
-                ],
+  Widget _buildWorkoutHistory(List<WorkoutLog> logs) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          'Workout History',
+          style: GoogleFonts.poppins(
+            fontSize: 20,
+            fontWeight: FontWeight.w500,
+          ),
+        ),
+        const SizedBox(height: 16),
+        ListView.builder(
+          shrinkWrap: true,
+          physics: const NeverScrollableScrollPhysics(),
+          itemCount: logs.length,
+          itemBuilder: (context, index) {
+            final log = logs[index];
+            return Card(
+              color: Colors.grey.withAlpha(51),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(15),
               ),
-            ),
-            const SizedBox(width: 16),
-            SizedBox(
-              height: 120,
-              width: 120,
-              child: PieChart(
-                PieChartData(
-                  sections: [
-                    PieChartSectionData(
-                      color: Colors.yellow,
-                      value: 328,
-                      title: '',
-                      radius: 20,
-                    ),
-                    PieChartSectionData(
-                      color: Colors.purple,
-                      value: 872,
-                      title: '',
-                      radius: 20,
-                    ),
-                    PieChartSectionData(
-                      color: Colors.lightBlue,
-                      value: 1200 - 328 - 872,
-                      title: '',
-                      radius: 20,
-                    ),
-                  ],
-                  centerSpaceRadius: 40,
-                  sectionsSpace: 2,
+              margin: const EdgeInsets.only(bottom: 10),
+              child: ListTile(
+                title: Text(
+                  log.exerciseTitle,
+                  style: GoogleFonts.poppins(fontWeight: FontWeight.w600),
+                ),
+                subtitle: Text(
+                  '${log.sets} sets, ${log.reps} reps',
+                  style: GoogleFonts.poppins(),
+                ),
+                trailing: Text(
+                  DateFormat.yMMMd().format(log.date),
+                  style: GoogleFonts.poppins(color: Colors.white70),
                 ),
               ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildCalorieInfo(String title, String value, Color color) {
-    return Row(
-      children: [
-        Container(
-          width: 10,
-          height: 10,
-          decoration: BoxDecoration(
-            color: color,
-            shape: BoxShape.circle,
-          ),
-        ),
-        const SizedBox(width: 8),
-        Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              value,
-              style: GoogleFonts.poppins(
-                fontWeight: FontWeight.bold,
-                fontSize: 16,
-              ),
-            ),
-            Text(
-              title,
-              style: GoogleFonts.poppins(
-                color: Colors.white.withOpacity(0.7),
-              ),
-            ),
-          ],
-        ),
-      ],
-    );
-  }
-
-  Widget _buildFilterChips() {
-    final chips = ['All', 'Running', 'Cycling'];
-    return Row(
-      children: List.generate(chips.length, (index) {
-        return Padding(
-          padding: const EdgeInsets.only(right: 8.0),
-          child: ChoiceChip(
-            label: Text(chips[index]),
-            selected: _selectedChipIndex == index,
-            onSelected: (selected) {
-              if (selected) {
-                setState(() {
-                  _selectedChipIndex = index;
-                });
-              }
-            },
-            backgroundColor: Colors.white.withOpacity(0.1),
-            selectedColor: const Color(0xFFD0FD3E),
-            labelStyle: TextStyle(
-              color: _selectedChipIndex == index ? Colors.black : Colors.white,
-              fontWeight: FontWeight.bold,
-            ),
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(20),
-              side: BorderSide.none,
-            ),
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-          ),
-        );
-      }),
-    );
-  }
-
-  Widget _buildStatsCards() {
-    return Row(
-      children: [
-        Expanded(
-          child: Card(
-            color: const Color(0xFFE6D9FE),
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(20),
-            ),
-            child: Padding(
-              padding: const EdgeInsets.all(20.0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text(
-                        'Steps',
-                        style: GoogleFonts.poppins(
-                          color: Colors.black,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                      const Icon(Icons.directions_walk, color: Colors.black),
-                    ],
-                  ),
-                  const SizedBox(height: 8),
-                  Text(
-                    '1840',
-                    style: GoogleFonts.poppins(
-                      color: Colors.black,
-                      fontSize: 28,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  Text(
-                    'Steps',
-                    style: GoogleFonts.poppins(
-                      color: Colors.black.withOpacity(0.7),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ),
-        ),
-        const SizedBox(width: 16),
-        Expanded(
-          child: Card(
-            color: const Color(0xFFD4C8F9),
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(20),
-            ),
-            child: Padding(
-              padding: const EdgeInsets.all(20.0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    'My Goals',
-                    style: GoogleFonts.poppins(
-                      color: Colors.black,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  const SizedBox(height: 8),
-                  Text(
-                    'Keep it up, you can achieve your goals.',
-                    style: GoogleFonts.poppins(
-                      color: Colors.black.withOpacity(0.7),
-                      fontSize: 12,
-                    ),
-                  ),
-                  const SizedBox(height: 16),
-                  LinearProgressIndicator(
-                    value: 0.42,
-                    backgroundColor: Colors.white.withOpacity(0.5),
-                    color: Colors.orange,
-                    minHeight: 6,
-                  ),
-                ],
-              ),
-            ),
-          ),
+            );
+          },
         ),
       ],
     );
@@ -356,7 +224,7 @@ class _ActivityScreenState extends State<ActivityScreen> {
     );
   }
 
-  Widget _buildTodaysChallengeCard() {
+  Widget _buildTodaysChallengeCard(List<ProgramExercise> exercises) {
     return Card(
       color: const Color(0xFFD0FD3E),
       shape: RoundedRectangleBorder(
@@ -379,13 +247,22 @@ class _ActivityScreenState extends State<ActivityScreen> {
                     ),
                   ),
                   const SizedBox(height: 8),
-                  Text(
-                    'Do your plan before 9:00 AM',
-                    style: GoogleFonts.poppins(
-                      color: Colors.black.withOpacity(0.7),
-                      fontSize: 14,
-                    ),
-                  ),
+                  if (exercises.isEmpty)
+                    Text(
+                      'No exercises planned for today.',
+                      style: GoogleFonts.poppins(
+                        color: Colors.black.withAlpha(178),
+                        fontSize: 14,
+                      ),
+                    )
+                  else
+                    ...exercises.map((e) => Text(
+                          e.exerciseTitle,
+                          style: GoogleFonts.poppins(
+                            color: Colors.black.withAlpha(178),
+                            fontSize: 14,
+                          ),
+                        )),
                 ],
               ),
             ),
