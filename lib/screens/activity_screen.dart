@@ -14,6 +14,7 @@ class ActivityScreen extends StatefulWidget {
 
 class _ActivityScreenState extends State<ActivityScreen> {
   DateTime _selectedDate = DateTime.now();
+  DateTime _focusedDate = DateTime.now();
   late Future<List<ProgramExercise>> _todaysExercisesFuture;
   late Future<List<WorkoutLog>> _workoutLogsFuture;
 
@@ -28,12 +29,19 @@ class _ActivityScreenState extends State<ActivityScreen> {
     final today = DateFormat('EEEE').format(DateTime.now());
     _todaysExercisesFuture = dbHelper.getProgramExercises().then((exercises) =>
         exercises.where((e) => e.dayOfWeek == today).toList());
-    _workoutLogsFuture = dbHelper.getWorkoutLogs();
+    _workoutLogsFuture = dbHelper.getWorkoutLogs(date: _selectedDate);
   }
 
-  void _onDateChanged(int days) {
+  void _onDaySelected(DateTime selectedDay) {
     setState(() {
-      _selectedDate = _selectedDate.add(Duration(days: days));
+      _selectedDate = selectedDay;
+      _workoutLogsFuture = DatabaseHelper.instance.getWorkoutLogs(date: _selectedDate);
+    });
+  }
+
+  void _onPageChanged(int days) {
+    setState(() {
+      _focusedDate = _focusedDate.add(Duration(days: days));
     });
   }
 
@@ -47,8 +55,15 @@ class _ActivityScreenState extends State<ActivityScreen> {
         ),
         actions: [
           IconButton(
-            onPressed: () {},
-            icon: const Icon(Icons.apps),
+            onPressed: () {
+              setState(() {
+                _focusedDate = DateTime.now();
+                _selectedDate = DateTime.now();
+                _workoutLogsFuture = DatabaseHelper.instance.getWorkoutLogs(date: _selectedDate);
+              });
+            },
+            icon: const Icon(Icons.today),
+            tooltip: 'Today',
           ),
         ],
         backgroundColor: Colors.transparent,
@@ -84,7 +99,7 @@ class _ActivityScreenState extends State<ActivityScreen> {
                 } else if (snapshot.hasError) {
                   return Center(child: Text('Error: ${snapshot.error}'));
                 } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-                  return const Center(child: Text('No workout history.'));
+                  return const Center(child: Text('No workout history for this day.'));
                 } else {
                   return _buildWorkoutHistory(snapshot.data!);
                 }
@@ -104,7 +119,7 @@ class _ActivityScreenState extends State<ActivityScreen> {
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             Text(
-              DateFormat('MMMM yyyy').format(_selectedDate),
+              DateFormat('MMMM yyyy').format(_focusedDate),
               style: GoogleFonts.poppins(
                 fontSize: 20,
                 fontWeight: FontWeight.w500,
@@ -113,7 +128,7 @@ class _ActivityScreenState extends State<ActivityScreen> {
             Row(
               children: [
                 IconButton(
-                  onPressed: () => _onDateChanged(-7),
+                  onPressed: () => _onPageChanged(-7),
                   icon: const Icon(Icons.chevron_left),
                   style: IconButton.styleFrom(
                     backgroundColor: Colors.white.withAlpha(25),
@@ -121,7 +136,7 @@ class _ActivityScreenState extends State<ActivityScreen> {
                 ),
                 const SizedBox(width: 8),
                 IconButton(
-                  onPressed: () => _onDateChanged(7),
+                  onPressed: () => _onPageChanged(7),
                   icon: const Icon(Icons.chevron_right),
                   style: IconButton.styleFrom(
                     backgroundColor: Colors.white.withAlpha(25),
@@ -135,11 +150,11 @@ class _ActivityScreenState extends State<ActivityScreen> {
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: List.generate(7, (index) {
-            final day = _selectedDate.subtract(Duration(days: _selectedDate.weekday - 1 - index));
+            final day = _focusedDate.subtract(Duration(days: _focusedDate.weekday - 1 - index));
             return _buildDateColumn(
-              DateFormat.E().format(day).substring(0, 1),
-              day.day.toString(),
-              isActive: day.day == _selectedDate.day,
+              day: day,
+              isSelected: day.day == _selectedDate.day && day.month == _selectedDate.month && day.year == _selectedDate.year,
+              isToday: day.day == DateTime.now().day && day.month == DateTime.now().month && day.year == DateTime.now().year,
             );
           }),
         ),
@@ -192,34 +207,40 @@ class _ActivityScreenState extends State<ActivityScreen> {
     );
   }
 
-  Widget _buildDateColumn(String day, String date, {bool isActive = false}) {
-    return Container(
-      padding: const EdgeInsets.all(12),
-      decoration: isActive
-          ? BoxDecoration(
-              color: const Color(0xFFD0FD3E),
-              borderRadius: BorderRadius.circular(16),
-            )
-          : null,
-      child: Column(
-        children: [
-          Text(
-            day,
-            style: GoogleFonts.poppins(
-              color: isActive ? Colors.black : Colors.white,
-              fontWeight: FontWeight.w500,
+  Widget _buildDateColumn({required DateTime day, bool isSelected = false, bool isToday = false}) {
+    return GestureDetector(
+      onTap: () => _onDaySelected(day),
+      child: Container(
+        padding: const EdgeInsets.all(12),
+        decoration: isSelected
+            ? BoxDecoration(
+                color: const Color(0xFFD0FD3E),
+                borderRadius: BorderRadius.circular(16),
+              )
+            : (isToday ? BoxDecoration(
+                border: Border.all(color: const Color(0xFFD0FD3E)),
+                borderRadius: BorderRadius.circular(16),
+              ) : null),
+        child: Column(
+          children: [
+            Text(
+              DateFormat.E().format(day).substring(0, 1),
+              style: GoogleFonts.poppins(
+                color: isSelected ? Colors.black : Colors.white,
+                fontWeight: FontWeight.w500,
+              ),
             ),
-          ),
-          const SizedBox(height: 8),
-          Text(
-            date,
-            style: GoogleFonts.poppins(
-              color: isActive ? Colors.black : Colors.white,
-              fontWeight: FontWeight.bold,
-              fontSize: 16,
+            const SizedBox(height: 8),
+            Text(
+              day.day.toString(),
+              style: GoogleFonts.poppins(
+                color: isSelected ? Colors.black : Colors.white,
+                fontWeight: FontWeight.bold,
+                fontSize: 16,
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }

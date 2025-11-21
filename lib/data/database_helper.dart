@@ -200,9 +200,21 @@ CREATE TABLE user_program (
     );
   }
 
-  Future<List<WorkoutLog>> getWorkoutLogs() async {
+  Future<List<WorkoutLog>> getWorkoutLogs({DateTime? date}) async {
     final db = await instance.database;
-    final result = await db.query('workout_log', orderBy: 'date DESC');
-    return result.map((json) => WorkoutLog.fromMap(json)).toList();
+    if (date != null) {
+      final startDate = DateTime(date.year, date.month, date.day);
+      final endDate = startDate.add(const Duration(days: 1));
+      final result = await db.query(
+        'workout_log',
+        where: 'date >= ? AND date < ?',
+        whereArgs: [startDate.toIso8601String(), endDate.toIso8601String()],
+        orderBy: 'date DESC',
+      );
+      return result.map((json) => WorkoutLog.fromMap(json)).toList();
+    } else {
+      final result = await db.query('workout_log', orderBy: 'date DESC');
+      return result.map((json) => WorkoutLog.fromMap(json)).toList();
+    }
   }
 }

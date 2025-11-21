@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:my_first_app/data/database_helper.dart';
 import 'package:my_first_app/models/program_exercise.dart';
 import 'package:collection/collection.dart';
+import 'package:my_first_app/screens/exercise_list_screen.dart';
 
 class ProgramScreen extends StatefulWidget {
   const ProgramScreen({super.key});
@@ -152,29 +153,66 @@ class _ProgramScreenState extends State<ProgramScreen> {
           ),
         ],
       ),
-      body: FutureBuilder<Map<String, List<ProgramExercise>>>(
-        future: _program,
-        builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return const Center(child: CircularProgressIndicator());
-          } else if (snapshot.hasError) {
-            return Center(child: Text('Error: ${snapshot.error}'));
-          } else if (!snapshot.hasData || snapshot.data!.values.every((list) => list.isEmpty)) {
-            return const Center(child: Text('Your program is empty. Add exercises to get started!'));
-          }
-
-          final programByDay = snapshot.data!;
-
-          return SingleChildScrollView(
-            scrollDirection: Axis.horizontal,
+      body: Column(
+        children: [
+          Padding(
+            padding: const EdgeInsets.all(16.0),
             child: Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: _daysOfWeek.map((day) {
-                return _buildDayColumn(context, day, programByDay[day]!);
-              }).toList(),
+              children: [
+                Expanded(
+                  child: ElevatedButton.icon(
+                    onPressed: () {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(content: Text('AI feature coming soon!')),
+                      );
+                    },
+                    icon: const Icon(Icons.auto_awesome_outlined),
+                    label: const Text('Create with AI'),
+                  ),
+                ),
+                const SizedBox(width: 16),
+                Expanded(
+                  child: ElevatedButton.icon(
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (context) => const ExerciseListScreen()),
+                      );
+                    },
+                    icon: const Icon(Icons.search_outlined),
+                    label: const Text('Browse All'),
+                  ),
+                ),
+              ],
             ),
-          );
-        },
+          ),
+          Expanded(
+            child: FutureBuilder<Map<String, List<ProgramExercise>>>(
+              future: _program,
+              builder: (context, snapshot) {
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return const Center(child: CircularProgressIndicator());
+                } else if (snapshot.hasError) {
+                  return Center(child: Text('Error: ${snapshot.error}'));
+                } else if (!snapshot.hasData || snapshot.data!.values.every((list) => list.isEmpty)) {
+                  return const Center(child: Text('Your program is empty. Add exercises to get started!'));
+                }
+
+                final programByDay = snapshot.data!;
+
+                return SingleChildScrollView(
+                  scrollDirection: Axis.horizontal,
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: _daysOfWeek.map((day) {
+                      return _buildDayColumn(context, day, programByDay[day]!);
+                    }).toList(),
+                  ),
+                );
+              },
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -184,7 +222,7 @@ class _ProgramScreenState extends State<ProgramScreen> {
       width: 280,
       margin: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 16.0),
       decoration: BoxDecoration(
-        color: Theme.of(context).colorScheme.surfaceVariant.withOpacity(0.5),
+        color: Theme.of(context).cardTheme.color,
         borderRadius: BorderRadius.circular(12.0),
       ),
       child: Column(

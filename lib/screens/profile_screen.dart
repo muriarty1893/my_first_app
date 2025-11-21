@@ -83,7 +83,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       controller: _nameController,
                       decoration: const InputDecoration(
                         labelText: 'Name',
-                        border: OutlineInputBorder(),
                       ),
                       validator: (value) {
                         if (value == null || value.isEmpty) {
@@ -97,7 +96,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       controller: _weightController,
                       decoration: const InputDecoration(
                         labelText: 'Weight (kg)',
-                        border: OutlineInputBorder(),
                       ),
                       keyboardType: TextInputType.number,
                       validator: (value) {
@@ -112,7 +110,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       controller: _heightController,
                       decoration: const InputDecoration(
                         labelText: 'Height (cm)',
-                        border: OutlineInputBorder(),
                       ),
                       keyboardType: TextInputType.number,
                       validator: (value) {
@@ -127,16 +124,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       controller: _goalController,
                       decoration: const InputDecoration(
                         labelText: 'Fitness Goal',
-                        border: OutlineInputBorder(),
                       ),
                       maxLines: 3,
                     ),
                     const SizedBox(height: 24),
                     ElevatedButton(
                       onPressed: _saveProfile,
-                      style: ElevatedButton.styleFrom(
-                        padding: const EdgeInsets.symmetric(vertical: 16),
-                      ),
                       child: const Text('Save Profile'),
                     ),
                   ],

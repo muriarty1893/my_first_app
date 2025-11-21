@@ -10,12 +10,9 @@ class HomeScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Theme.of(context).colorScheme.surfaceVariant.withOpacity(0.4),
       appBar: AppBar(
         title: const Text('Fitness AI'),
         centerTitle: true,
-        elevation: 0,
-        backgroundColor: Colors.transparent,
       ),
       body: ListView(
         padding: const EdgeInsets.all(16.0),
@@ -97,10 +94,6 @@ class HomeScreen extends StatelessWidget {
     required VoidCallback onTap,
   }) {
     return Card(
-      elevation: 2.0,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(12.0),
-      ),
       child: InkWell(
         borderRadius: BorderRadius.circular(12.0),
         onTap: onTap,
