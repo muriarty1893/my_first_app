@@ -143,7 +143,7 @@ class _ExerciseListScreenState extends State<ExerciseListScreen> {
 
                       DropdownButtonFormField<String>(
 
-                        value: selectedDay,
+                        initialValue: selectedDay,
 
                         decoration:
 
@@ -273,21 +273,25 @@ class _ExerciseListScreenState extends State<ExerciseListScreen> {
 
                       );
 
-                      await DatabaseHelper.instance
+                                            await DatabaseHelper.instance
 
-                          .addProgramExercise(programExercise);
+                                                .addProgramExercise(programExercise);
 
-                      Navigator.of(context).pop();
+                      
 
-                      ScaffoldMessenger.of(context).showSnackBar(
+                                            if (!context.mounted) return;
 
-                        SnackBar(
+                                            Navigator.of(context).pop();
 
-                            content:
+                                            ScaffoldMessenger.of(context).showSnackBar(
 
-                                Text('${exercise.title} added to $selectedDay')),
+                                              SnackBar(
 
-                      );
+                                                  content:
+
+                                                      Text('${exercise.title} added to $selectedDay')),
+
+                                            );
 
                     }
 

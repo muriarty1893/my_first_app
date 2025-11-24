@@ -58,6 +58,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
         goal: _goalController.text,
       );
       await DatabaseHelper.instance.saveProfile(updatedProfile);
+      if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Profile saved successfully')),
       );

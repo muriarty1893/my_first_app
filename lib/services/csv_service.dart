@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:csv/csv.dart';
 import 'package:flutter/services.dart';
 import 'package:my_first_app/data/database_helper.dart';
@@ -24,7 +25,7 @@ class CsvService {
         await _dbHelper.insertExercise(exercise);
       } catch (e) {
         // Optional: handle or log parsing errors for specific rows
-        print('Error parsing row $i: $row. Error: $e');
+        debugPrint('Error parsing row $i: $row. Error: $e');
       }
     }
   }

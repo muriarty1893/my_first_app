@@ -96,10 +96,11 @@ class _ProgramScreenState extends State<ProgramScreen> {
               child: const Text('Save'),
               onPressed: () async {
                 if (formKey.currentState!.validate()) {
+                  final navigator = Navigator.of(context);
                   exercise.sets = int.parse(setsController.text);
                   exercise.reps = int.parse(repsController.text);
                   await DatabaseHelper.instance.updateProgramExercise(exercise);
-                  Navigator.of(context).pop();
+                  navigator.pop();
                   _refreshProgram();
                 }
               },
@@ -125,8 +126,9 @@ class _ProgramScreenState extends State<ProgramScreen> {
             TextButton(
               child: const Text('Clear'),
               onPressed: () async {
+                final navigator = Navigator.of(context);
                 await DatabaseHelper.instance.clearAllExerciseCompletion();
-                Navigator.of(context).pop();
+                navigator.pop();
                 _refreshProgram();
               },
             ),
@@ -271,12 +273,13 @@ class _ProgramScreenState extends State<ProgramScreen> {
                           ),
                           trailing: PopupMenuButton<String>(
                             onSelected: (value) async {
+                              final scaffoldMessenger = ScaffoldMessenger.of(context);
                               if (value == 'edit') {
                                 unawaited(_showEditExerciseDialog(progExercise));
                               } else if (value == 'delete') {
                                 await DatabaseHelper.instance.deleteProgramExercise(progExercise.id!);
                                 _refreshProgram();
-                                ScaffoldMessenger.of(context).showSnackBar(
+                                scaffoldMessenger.showSnackBar(
                                   SnackBar(content: Text('${progExercise.exerciseTitle} removed from program.')),
                                 );
                               }

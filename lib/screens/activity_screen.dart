@@ -50,7 +50,7 @@ class _ActivityScreenState extends State<ActivityScreen> {
     return Scaffold(
       appBar: AppBar(
         title: Text(
-          'Your Activity',
+          'My Activity',
           style: GoogleFonts.poppins(fontWeight: FontWeight.w600),
         ),
         actions: [
