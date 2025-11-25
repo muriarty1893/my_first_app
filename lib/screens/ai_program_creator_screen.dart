@@ -45,8 +45,22 @@ class _AiProgramCreatorScreenState extends State<AiProgramCreatorScreen> {
   String _errorMessage = '';
   bool _isLoading = false;
 
+  String? _selectedLevelFilter; // State for level filter
+  bool _isFullBodyFilter = false; // State for full body filter
+
+  @override
+  void initState() {
+    super.initState();
+    _selectedLevelFilter = 'Any'; // Default value for level filter
+  }
+
   Future<void> _generateProgram() async {
-    if (_textController.text.isEmpty) return;
+    if (_textController.text.isEmpty) {
+      setState(() {
+        _errorMessage = 'Please describe your desired workout program.';
+      });
+      return;
+    }
 
     setState(() {
       _isLoading = true;
@@ -55,7 +69,11 @@ class _AiProgramCreatorScreenState extends State<AiProgramCreatorScreen> {
     });
 
     try {
-      final rawJsonResponse = await _aiService.generateProgram(_textController.text);
+      final rawJsonResponse = await _aiService.generateProgram(
+        _textController.text,
+        levelFilter: _selectedLevelFilter == 'Any' ? null : _selectedLevelFilter,
+        isFullBody: _isFullBodyFilter,
+      );
       
       // Parse the JSON response
       final decoded = jsonDecode(rawJsonResponse);
@@ -182,6 +200,44 @@ class _AiProgramCreatorScreenState extends State<AiProgramCreatorScreen> {
                 hintText: 'e.g., "A 3-day full-body workout for a beginner with access to dumbbells."',
               ),
               maxLines: 3,
+            ),
+            const SizedBox(height: 16),
+            Row(
+              children: [
+                Expanded(
+                  child: DropdownButtonFormField<String>(
+                    decoration: const InputDecoration(
+                      labelText: 'Level',
+                      border: OutlineInputBorder(),
+                    ),
+                    value: _selectedLevelFilter,
+                    items: <String>['Any', 'Beginner', 'Intermediate', 'Advanced']
+                        .map<DropdownMenuItem<String>>((String value) {
+                      return DropdownMenuItem<String>(
+                        value: value,
+                        child: Text(value),
+                      );
+                    }).toList(),
+                    onChanged: (String? newValue) {
+                      setState(() {
+                        _selectedLevelFilter = newValue;
+                      });
+                    },
+                  ),
+                ),
+                const SizedBox(width: 16),
+                Expanded(
+                  child: SwitchListTile(
+                    title: const Text('Full Body'),
+                    value: _isFullBodyFilter,
+                    onChanged: (bool value) {
+                      setState(() {
+                        _isFullBodyFilter = value;
+                      });
+                    },
+                  ),
+                ),
+              ],
             ),
             const SizedBox(height: 16),
             ElevatedButton.icon(
