@@ -47,7 +47,7 @@ class _ProgressScreenState extends State<ProgressScreen> {
                 child: ListTile(
                   title: Text(log.exerciseTitle),
                   subtitle: Text('Sets: ${log.sets}, Reps: ${log.reps}'),
-                  trailing: Text(DateFormat.yMMMd().format(log.date)),
+                  trailing: Text(DateFormat.yMMMd('en_US').format(log.date)),
                 ),
               );
             },

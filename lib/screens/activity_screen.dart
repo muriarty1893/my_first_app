@@ -24,7 +24,7 @@ class _ActivityScreenState extends State<ActivityScreen> {
 
   void _fetchProgramForSelectedDate() {
     final dbHelper = DatabaseHelper.instance;
-    final dayOfWeek = DateFormat('EEEE').format(_selectedDate);
+    final dayOfWeek = DateFormat('EEEE', 'en_US').format(_selectedDate);
     _programForDayFuture = dbHelper.getProgramExercises().then(
         (exercises) => exercises.where((e) => e.dayOfWeek == dayOfWeek).toList());
   }
@@ -102,7 +102,7 @@ class _ActivityScreenState extends State<ActivityScreen> {
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             Text(
-              DateFormat('MMMM yyyy').format(_focusedDate),
+              DateFormat('MMMM yyyy', 'en_US').format(_focusedDate),
               style: GoogleFonts.poppins(
                 fontSize: 20,
                 fontWeight: FontWeight.w500,
@@ -129,7 +129,7 @@ class _ActivityScreenState extends State<ActivityScreen> {
             final day = _focusedDate.subtract(Duration(days: _focusedDate.weekday - 1 - index));
             return _buildDateColumn(
               day: day,
-              isSelected: DateFormat.yMd().format(day) == DateFormat.yMd().format(_selectedDate),
+              isSelected: DateFormat.yMd('en_US').format(day) == DateFormat.yMd('en_US').format(_selectedDate),
               isToday: _isToday(day),
             );
           }),
@@ -155,7 +155,7 @@ class _ActivityScreenState extends State<ActivityScreen> {
         child: Column(
           children: [
             Text(
-              DateFormat.E().format(day).substring(0, 1),
+              DateFormat.E('en_US').format(day).substring(0, 1),
               style: GoogleFonts.poppins(
                 color: isSelected ? Colors.black : Colors.white,
                 fontWeight: FontWeight.w500,
@@ -183,7 +183,7 @@ class _ActivityScreenState extends State<ActivityScreen> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            _isToday(_selectedDate) ? 'Bugünün Programı' : DateFormat.yMMMEd().format(_selectedDate),
+            _isToday(_selectedDate) ? 'Today\'s Program' : DateFormat.yMMMEd('en_US').format(_selectedDate),
             style: GoogleFonts.poppins(
               fontSize: 20,
               fontWeight: FontWeight.w500,
@@ -234,12 +234,12 @@ class _ActivityScreenState extends State<ActivityScreen> {
           const Icon(Icons.calendar_today_outlined, size: 60, color: Colors.white54),
           const SizedBox(height: 16),
           Text(
-            'Bu gün için planlanmış bir antrenman yok.',
+            'No workout planned for this day.',
             style: GoogleFonts.poppins(fontSize: 16, color: Colors.white70),
           ),
           const SizedBox(height: 8),
           Text(
-            'Dinlenme gününün tadını çıkar!',
+            'Enjoy your rest day!',
             style: GoogleFonts.poppins(fontSize: 14, color: Colors.white54),
           ),
         ],

@@ -2,6 +2,7 @@ import 'package:my_first_app/screens/main_screen.dart';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:my_first_app/services/csv_service.dart';
 import 'package:my_first_app/theme/app_theme.dart';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
@@ -39,6 +40,13 @@ class MyApp extends StatelessWidget {
       theme: AppTheme.darkTheme,
       darkTheme: AppTheme.darkTheme,
       themeMode: ThemeMode.dark, // Enforce dark theme
+      locale: const Locale('en', 'US'),
+      supportedLocales: const [Locale('en', 'US')],
+      localizationsDelegates: const [
+        GlobalMaterialLocalizations.delegate,
+        GlobalWidgetsLocalizations.delegate,
+        GlobalCupertinoLocalizations.delegate,
+      ],
       home: const MainScreen(),
       debugShowCheckedModeBanner: false,
     );

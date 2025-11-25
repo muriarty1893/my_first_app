@@ -99,7 +99,7 @@ class _WorkoutHistoryScreenState extends State<WorkoutHistoryScreen> {
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             Text(
-              DateFormat('MMMM yyyy').format(_focusedDate),
+              DateFormat('MMMM yyyy', 'en_US').format(_focusedDate),
               style: GoogleFonts.poppins(
                 fontSize: 20,
                 fontWeight: FontWeight.w500,
@@ -152,7 +152,7 @@ class _WorkoutHistoryScreenState extends State<WorkoutHistoryScreen> {
                 child: Column(
                   children: [
                     Text(
-                      DateFormat.E().format(day).substring(0, 1),
+                      DateFormat.E('en_US').format(day).substring(0, 1),
                       style: GoogleFonts.poppins(
                         color: isSelected ? Colors.black : Colors.white,
                         fontWeight: FontWeight.w500,
@@ -200,7 +200,7 @@ class _WorkoutHistoryScreenState extends State<WorkoutHistoryScreen> {
               style: GoogleFonts.poppins(),
             ),
             trailing: Text(
-              DateFormat.yMMMd().format(log.date),
+              DateFormat.yMMMd('en_US').format(log.date),
               style: GoogleFonts.poppins(color: Colors.white70),
             ),
           ),
