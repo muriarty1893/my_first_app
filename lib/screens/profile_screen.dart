@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:my_first_app/data/database_helper.dart';
 import 'package:my_first_app/models/user_profile.dart';
+import 'package:my_first_app/screens/workout_history_screen.dart';
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
@@ -132,6 +133,24 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     ElevatedButton(
                       onPressed: _saveProfile,
                       child: const Text('Save Profile'),
+                    ),
+                    const SizedBox(height: 24),
+                    const Divider(),
+                    const SizedBox(height: 24),
+                    OutlinedButton.icon(
+                      onPressed: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(builder: (context) => const WorkoutHistoryScreen()),
+                        );
+                      },
+                      icon: const Icon(Icons.history_edu_outlined),
+                      label: const Text('View Workout History'),
+                      style: OutlinedButton.styleFrom(
+                        foregroundColor: Colors.white,
+                        side: const BorderSide(color: Colors.white54),
+                        padding: const EdgeInsets.symmetric(vertical: 12),
+                      ),
                     ),
                   ],
                 ),
