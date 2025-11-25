@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:my_first_app/data/database_helper.dart';
 import 'package:my_first_app/models/program_exercise.dart';
 import 'package:collection/collection.dart';
+import 'package:my_first_app/screens/ai_program_creator_screen.dart';
 import 'package:my_first_app/screens/exercise_list_screen.dart';
 
 class ProgramScreen extends StatefulWidget {
@@ -164,8 +165,9 @@ class _ProgramScreenState extends State<ProgramScreen> {
                 Expanded(
                   child: ElevatedButton.icon(
                     onPressed: () {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(content: Text('AI feature coming soon!')),
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (context) => const AiProgramCreatorScreen()),
                       );
                     },
                     icon: const Icon(Icons.auto_awesome_outlined),

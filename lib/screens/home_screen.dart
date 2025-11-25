@@ -4,6 +4,8 @@ import 'package:my_first_app/screens/program_screen.dart';
 import 'package:my_first_app/screens/profile_screen.dart';
 import 'package:my_first_app/screens/progress_screen.dart';
 
+import 'package:my_first_app/screens/ai_program_creator_screen.dart';
+
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
 
@@ -75,9 +77,9 @@ class HomeScreen extends StatelessWidget {
             title: 'Create Program with AI',
             subtitle: 'Let our AI generate a custom plan for you.',
             onTap: () {
-              // Placeholder for AI feature
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(content: Text('AI feature coming soon!')),
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => const AiProgramCreatorScreen()),
               );
             },
           ),

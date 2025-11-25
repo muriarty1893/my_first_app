@@ -181,6 +181,11 @@ CREATE TABLE user_program (
     );
   }
 
+  Future<void> clearUserProgram() async {
+    final db = await instance.database;
+    await db.delete('user_program');
+  }
+
   Future<void> clearAllExerciseCompletion() async {
     final db = await instance.database;
     await db.update('user_program', {'isCompleted': 0});
