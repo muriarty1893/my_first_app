@@ -1,3 +1,4 @@
+import 'package:animated_text_kit/animated_text_kit.dart';
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:collection/collection.dart';
@@ -193,15 +194,21 @@ class _AiProgramCreatorScreenState extends State<AiProgramCreatorScreen> {
             ),
             const SizedBox(height: 24),
             if (_isLoading)
-              const Center(
+              Center(
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    CircularProgressIndicator(),
-                    SizedBox(height: 16),
-                    Text(
-                      'Generating Program...',
-                      style: TextStyle(fontSize: 16),
+                    const CircularProgressIndicator(),
+                    const SizedBox(height: 16),
+                    AnimatedTextKit(
+                      animatedTexts: [
+                        TyperAnimatedText(
+                          'Generating Program...',
+                          textStyle: const TextStyle(fontSize: 16),
+                          speed: const Duration(milliseconds: 100),
+                        ),
+                      ],
+                      repeatForever: true,
                     ),
                   ],
                 ),
@@ -228,7 +235,14 @@ class _AiProgramCreatorScreenState extends State<AiProgramCreatorScreen> {
         final exercises = groupedProgram[day]!;
         return Card(
           margin: const EdgeInsets.only(bottom: 16),
+          clipBehavior: Clip.none, // Try to prevent any clipping that might interfere with rendering
           child: ExpansionTile(
+            shape: const Border(), // Remove border when expanded
+            collapsedShape: const Border(), // Remove border when collapsed
+            tilePadding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0), // Reintroduce padding for the title
+            childrenPadding: const EdgeInsets.symmetric(horizontal: 16.0), // Reintroduce padding for the children content
+            backgroundColor: Colors.transparent, // Ensure no background color is causing lines
+            collapsedBackgroundColor: Colors.transparent, // Ensure no background color is causing lines
             title: Text(day, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 18)),
             initiallyExpanded: true,
             children: exercises.map((exercise) {
@@ -243,3 +257,4 @@ class _AiProgramCreatorScreenState extends State<AiProgramCreatorScreen> {
     );
   }
 }
+
