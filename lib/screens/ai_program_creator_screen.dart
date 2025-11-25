@@ -193,7 +193,19 @@ class _AiProgramCreatorScreenState extends State<AiProgramCreatorScreen> {
             ),
             const SizedBox(height: 24),
             if (_isLoading)
-              const Center(child: CircularProgressIndicator())
+              const Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    CircularProgressIndicator(),
+                    SizedBox(height: 16),
+                    Text(
+                      'Generating Program...',
+                      style: TextStyle(fontSize: 16),
+                    ),
+                  ],
+                ),
+              )
             else if (_errorMessage.isNotEmpty)
               Center(child: Text(_errorMessage, style: const TextStyle(color: Colors.red)))
             else if (_generatedProgram.isNotEmpty)
