@@ -73,4 +73,83 @@ class AppTheme {
       ),
     ),
   );
+
+  static final ThemeData lightTheme = ThemeData(
+    scaffoldBackgroundColor: const Color(0xFF000000), // Black
+    appBarTheme: AppBarTheme(
+      backgroundColor: Colors.transparent,
+      elevation: 0,
+      titleTextStyle: GoogleFonts.poppins(
+        color: Colors.white, // White text on black app bar
+        fontWeight: FontWeight.w600,
+        fontSize: 20,
+      ),
+      iconTheme: const IconThemeData(color: Colors.white), // White icons on black app bar
+    ),
+    colorScheme: const ColorScheme.light(
+      primary: Color(0xFFFF0000), // Bright red
+      secondary: Color(0xFF950101), // Darker red secondary accent
+      onPrimary: Colors.white, // White text on bright red primary
+      onSecondary: Colors.white, // White text on dark red secondary
+      background: Color(0xFF000000), // Black background
+      surface: Color(0xFF3D0000), // Very dark red for cards/surfaces
+      onBackground: Colors.white, // White text on black background
+      onSurface: Colors.white, // White text on very dark red surface
+    ),
+    textTheme: GoogleFonts.poppinsTextTheme(
+      ThemeData.light().textTheme,
+    ).apply(
+      bodyColor: Colors.white, // General body text white
+      displayColor: Colors.white, // General display text white
+    ),
+    cardTheme: CardThemeData(
+      color: const Color(0xFF3D0000), // Very dark red cards
+      elevation: 4,
+      shadowColor: const Color(0xFFFF0000).withOpacity(0.3), // Red shadow
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(16),
+      ),
+    ),
+    elevatedButtonTheme: ElevatedButtonThemeData(
+      style: ElevatedButton.styleFrom(
+        backgroundColor: const Color(0xFFFF0000), // Bright red button
+        foregroundColor: Colors.white, // White text on bright red button
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(10),
+        ),
+        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 15),
+      ),
+    ),
+    floatingActionButtonTheme: const FloatingActionButtonThemeData(
+      backgroundColor: Color(0xFFFF0000), // Bright red FAB
+      foregroundColor: Colors.white, // White icon on bright red FAB
+    ),
+    bottomNavigationBarTheme: BottomNavigationBarThemeData(
+      backgroundColor: const Color(0xFF000000), // Black bottom nav bar
+      selectedItemColor: const Color(0xFFFF0000), // Bright red selected item
+      unselectedItemColor: Colors.white.withOpacity(0.6), // Faded white unselected item
+      showUnselectedLabels: true,
+      elevation: 8,
+    ),
+    inputDecorationTheme: InputDecorationTheme(
+      filled: true,
+      fillColor: const Color(0xFF3D0000), // Very dark red input field background
+      border: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(10),
+        borderSide: BorderSide.none,
+      ),
+      hintStyle: TextStyle(color: Colors.white.withOpacity(0.5)), // Faded white hint text
+    ),
+    chipTheme: ChipThemeData(
+      backgroundColor: const Color(0xFF3D0000), // Very dark red chip background
+      selectedColor: const Color(0xFFFF0000), // Bright red selected chip
+      labelStyle: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold), // White label text
+      secondaryLabelStyle: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold), // White secondary label text
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(20),
+        side: const BorderSide(color: Colors.transparent),
+      ),
+    ),
+  );
 }

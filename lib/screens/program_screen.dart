@@ -235,7 +235,9 @@ class _ProgramScreenState extends State<ProgramScreen> {
             padding: const EdgeInsets.all(12.0),
             child: Text(
               day,
-              style: Theme.of(context).textTheme.titleLarge,
+              style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                    color: Theme.of(context).colorScheme.onSurface,
+                  ),
             ),
           ),
           const Divider(height: 1),

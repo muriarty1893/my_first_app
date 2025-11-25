@@ -37,9 +37,9 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'AI Fitness Trainer',
-      theme: AppTheme.darkTheme,
-      darkTheme: AppTheme.darkTheme,
-      themeMode: ThemeMode.dark, // Enforce dark theme
+      theme: AppTheme.lightTheme,
+      darkTheme: AppTheme.darkTheme, // Keep dark theme available
+      themeMode: ThemeMode.light, // Enforce light theme for now
       locale: const Locale('en', 'US'),
       supportedLocales: const [Locale('en', 'US')],
       localizationsDelegates: const [

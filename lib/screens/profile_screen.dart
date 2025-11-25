@@ -147,8 +147,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       icon: const Icon(Icons.history_edu_outlined),
                       label: const Text('View Workout History'),
                       style: OutlinedButton.styleFrom(
-                        foregroundColor: Colors.white,
-                        side: const BorderSide(color: Colors.white54),
+                        foregroundColor: Theme.of(context).colorScheme.primary,
+                        side: BorderSide(color: Theme.of(context).colorScheme.primary.withOpacity(0.5)),
                         padding: const EdgeInsets.symmetric(vertical: 12),
                       ),
                     ),

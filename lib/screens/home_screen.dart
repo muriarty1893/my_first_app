@@ -16,74 +16,87 @@ class HomeScreen extends StatelessWidget {
         title: const Text('Fitness AI'),
         centerTitle: true,
       ),
-      body: ListView(
-        padding: const EdgeInsets.all(16.0),
-        children: [
-          _buildNavigationCard(
-            context: context,
-            icon: Icons.person_outline,
-            title: 'My Profile',
-            subtitle: 'View and edit your personal details.',
-            onTap: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => const ProfileScreen()),
-              );
-            },
+      body: Container(
+        decoration: BoxDecoration(
+          image: DecorationImage(
+            image: const NetworkImage(
+                'https://images.pexels.com/photos/4164844/pexels-photo-4164844.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1'),
+            fit: BoxFit.cover,
+            colorFilter: ColorFilter.mode(
+              Colors.white.withOpacity(0.8),
+              BlendMode.dstATop,
+            ),
           ),
-          const SizedBox(height: 16),
-          _buildNavigationCard(
-            context: context,
-            icon: Icons.show_chart,
-            title: 'My Progress',
-            subtitle: 'Visualize your workout history.',
-            onTap: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => const ProgressScreen()),
-              );
-            },
-          ),
-          const SizedBox(height: 16),
-          _buildNavigationCard(
-            context: context,
-            icon: Icons.assignment_outlined,
-            title: 'My Program',
-            subtitle: 'View and track your weekly workout plan.',
-            onTap: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => const ProgramScreen()),
-              );
-            },
-          ),
-          const SizedBox(height: 16),
-          _buildNavigationCard(
-            context: context,
-            icon: Icons.search_outlined,
-            title: 'Browse All Exercises',
-            subtitle: 'Find exercises and build your program.',
-            onTap: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => const ExerciseListScreen()),
-              );
-            },
-          ),
-          const SizedBox(height: 16),
-          _buildNavigationCard(
-            context: context,
-            icon: Icons.auto_awesome_outlined,
-            title: 'Create Program with AI',
-            subtitle: 'Let our AI generate a custom plan for you.',
-            onTap: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => const AiProgramCreatorScreen()),
-              );
-            },
-          ),
-        ],
+        ),
+        child: ListView(
+          padding: const EdgeInsets.all(16.0),
+          children: [
+            _buildNavigationCard(
+              context: context,
+              icon: Icons.person_outline,
+              title: 'My Profile',
+              subtitle: 'View and edit your personal details.',
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => const ProfileScreen()),
+                );
+              },
+            ),
+            const SizedBox(height: 16),
+            _buildNavigationCard(
+              context: context,
+              icon: Icons.show_chart,
+              title: 'My Progress',
+              subtitle: 'Visualize your workout history.',
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => const ProgressScreen()),
+                );
+              },
+            ),
+            const SizedBox(height: 16),
+            _buildNavigationCard(
+              context: context,
+              icon: Icons.assignment_outlined,
+              title: 'My Program',
+              subtitle: 'View and track your weekly workout plan.',
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => const ProgramScreen()),
+                );
+              },
+            ),
+            const SizedBox(height: 16),
+            _buildNavigationCard(
+              context: context,
+              icon: Icons.search_outlined,
+              title: 'Browse All Exercises',
+              subtitle: 'Find exercises and build your program.',
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => const ExerciseListScreen()),
+                );
+              },
+            ),
+            const SizedBox(height: 16),
+            _buildNavigationCard(
+              context: context,
+              icon: Icons.auto_awesome_outlined,
+              title: 'Create Program with AI',
+              subtitle: 'Let our AI generate a custom plan for you.',
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => const AiProgramCreatorScreen()),
+                );
+              },
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -96,8 +109,12 @@ class HomeScreen extends StatelessWidget {
     required VoidCallback onTap,
   }) {
     return Card(
+      elevation: Theme.of(context).cardTheme.elevation,
+      shadowColor: Theme.of(context).cardTheme.shadowColor,
+      color: Theme.of(context).cardTheme.color?.withOpacity(0.85), // Make cards slightly transparent
+      shape: Theme.of(context).cardTheme.shape,
       child: InkWell(
-        borderRadius: BorderRadius.circular(12.0),
+        borderRadius: BorderRadius.circular(20.0),
         onTap: onTap,
         child: Padding(
           padding: const EdgeInsets.all(24.0),
@@ -115,7 +132,7 @@ class HomeScreen extends StatelessWidget {
                   children: [
                     Text(
                       title,
-                      style: Theme.of(context).textTheme.titleLarge,
+                      style: Theme.of(context).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
                     ),
                     const SizedBox(height: 4.0),
                     Text(
@@ -125,7 +142,7 @@ class HomeScreen extends StatelessWidget {
                   ],
                 ),
               ),
-              const Icon(Icons.arrow_forward_ios, color: Colors.grey),
+              Icon(Icons.arrow_forward_ios, color: Colors.grey.shade400),
             ],
           ),
         ),
